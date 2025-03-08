@@ -30,7 +30,7 @@ class HomeViewModel: ObservableObject {
         let serviceLocator = ServiceLocator.shared
         self.init(
             dataService: serviceLocator.dataService,
-            statsService: serviceLocator.statsService,
+            statsService: serviceLocator.statsServiceProtocol,
             workoutService: serviceLocator.workoutService,
             unitService: serviceLocator.unitService
         )

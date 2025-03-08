@@ -27,7 +27,7 @@ struct ProfileView: View {
         let serviceLocator = ServiceLocator.shared
         _viewModel = StateObject(wrappedValue: ProfileViewModel(
             dataService: serviceLocator.dataService,
-            statsService: serviceLocator.statsService,
+            statsService: serviceLocator.statsServiceProtocol,
             unitService: serviceLocator.unitService
         ))
     }

@@ -20,7 +20,7 @@ struct HomeView: View {
         let serviceLocator = ServiceLocator.shared
         _viewModel = StateObject(wrappedValue: HomeViewModel(
             dataService: serviceLocator.dataService,
-            statsService: serviceLocator.statsService,
+            statsService: serviceLocator.statsServiceProtocol,
             workoutService: serviceLocator.workoutService,
             unitService: serviceLocator.unitService
         ))

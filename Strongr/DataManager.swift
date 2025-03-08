@@ -5,6 +5,12 @@
 //  Created by Joshua Sellers on 3/2/25.
 //
 
+// MARK: - DEPRECATION NOTICE
+// This class is being deprecated in favor of the repository pattern.
+// New code should use the repositories and services directly from ServiceLocator.shared.
+// This class is maintained for backward compatibility during the refactoring process.
+// It will be removed in a future version.
+
 import Foundation
 import CoreData
 import SwiftUI
@@ -992,5 +998,33 @@ extension DataManager {
         try? manager.context.save()
         
         return manager
+    }
+}
+
+// MARK: - Repository Pattern Compatibility
+extension DataManager {
+    // Helper to get the repositories from the ServiceLocator
+    private var userRepository: any UserRepository {
+        return ServiceLocator.shared.userRepository
+    }
+    
+    private var exerciseRepository: any ExerciseRepository {
+        return ServiceLocator.shared.exerciseRepository
+    }
+    
+    private var workoutRepository: any WorkoutRepository {
+        return ServiceLocator.shared.workoutRepository
+    }
+    
+    private var workoutSetRepository: any WorkoutSetRepository {
+        return ServiceLocator.shared.workoutSetRepository
+    }
+    
+    private var statsService: any StatsService {
+        return ServiceLocator.shared.statsService
+    }
+    
+    private var dataSeedingService: any DataSeedingService {
+        return ServiceLocator.shared.dataSeedingService
     }
 } 

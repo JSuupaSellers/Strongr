@@ -41,7 +41,7 @@ class ProfileViewModel: ObservableObject {
         let serviceLocator = ServiceLocator.shared
         self.init(
             dataService: serviceLocator.dataService,
-            statsService: serviceLocator.statsService,
+            statsService: serviceLocator.statsServiceProtocol,
             unitService: serviceLocator.unitService
         )
     }
