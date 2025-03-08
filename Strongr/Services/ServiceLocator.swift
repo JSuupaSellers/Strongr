@@ -9,6 +9,7 @@ class ServiceLocator {
     private(set) var dataService: DataServiceProtocol
     private(set) var statsService: StatsServiceProtocol
     private(set) var workoutService: WorkoutServiceProtocol
+    private(set) var unitService: UnitServiceProtocol
     
     // Private initializer to enforce singleton pattern
     private init() {
@@ -20,6 +21,7 @@ class ServiceLocator {
         dataService = LocalDataService(dataManager: dataManager)
         statsService = LocalStatsService(dataService: dataService)
         workoutService = LocalWorkoutService()
+        unitService = LocalUnitService()
     }
     
     // If you ever want to switch to remote implementations later:

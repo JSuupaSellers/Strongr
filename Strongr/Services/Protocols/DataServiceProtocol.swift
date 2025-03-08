@@ -21,6 +21,12 @@ protocol DataServiceProtocol {
     /// Get exercise history for a user
     func getExerciseHistory(for user: User, since date: Date) -> [ExerciseHistory]
     
+    /// Save changes to the data store
+    func saveContext()
+    
+    /// Create a new user
+    func createUser(name: String, weight: Double?, height: Double?, age: Int16?) -> User
+    
     /// Get the Core Data context for direct access when needed
     var context: NSManagedObjectContext { get }
 } 

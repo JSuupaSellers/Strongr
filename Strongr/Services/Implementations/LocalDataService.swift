@@ -2,7 +2,8 @@ import Foundation
 import CoreData
 
 class LocalDataService: DataServiceProtocol {
-    private let dataManager: DataManager
+    // Expose dataManager for transition from old code to new service architecture
+    internal let dataManager: DataManager
     
     init(dataManager: DataManager) {
         self.dataManager = dataManager
@@ -111,6 +112,14 @@ class LocalDataService: DataServiceProtocol {
             print("Error fetching exercise history: \(error)")
             return []
         }
+    }
+    
+    func saveContext() {
+        dataManager.saveContext()
+    }
+    
+    func createUser(name: String, weight: Double?, height: Double?, age: Int16?) -> User {
+        return dataManager.createUser(name: name, weight: weight, height: height, age: age)
     }
     
     // MARK: - Helper Methods

@@ -8,9 +8,23 @@
 import SwiftUI
 
 struct HomeView: View {
+    // Environment objects needed for UI components
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var unitManager: UnitManager
-    @StateObject private var viewModel = HomeViewModel()
+    
+    // ViewModel with dependency injection
+    @StateObject private var viewModel: HomeViewModel
+    
+    init() {
+        // Initialize view model with service dependencies
+        let serviceLocator = ServiceLocator.shared
+        _viewModel = StateObject(wrappedValue: HomeViewModel(
+            dataService: serviceLocator.dataService,
+            statsService: serviceLocator.statsService,
+            workoutService: serviceLocator.workoutService,
+            unitService: serviceLocator.unitService
+        ))
+    }
     
     var body: some View {
         ScrollView {
@@ -57,9 +71,7 @@ struct HomeView: View {
             }
         }
         .onAppear {
-            // Give the view model access to the environment objects
-            viewModel.setupWith(dataManager: dataManager, unitManager: unitManager)
-            // Load the data
+            // Load data (no need to pass managers now)
             viewModel.loadData()
         }
     }
