@@ -12,8 +12,15 @@ import SwiftUI
 class DataManager: ObservableObject {
     public let context: NSManagedObjectContext
     
+    // Singleton instance
+    static let shared = DataManager()
+    
     init(context: NSManagedObjectContext) {
         self.context = context
+    }
+    
+    init() {
+        self.context = PersistenceController.shared.container.viewContext
     }
     
     // MARK: - First Launch Detection

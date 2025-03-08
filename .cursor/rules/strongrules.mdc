@@ -1,0 +1,14 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Your rule content
+
+- Keep the UI consistent.
+- Use best practices for iOS developing.
+- Keep total file code length to less than 500.
+- Refactor code if you can and it makes sense.
+- Always remove duplicate code after refactors.
+

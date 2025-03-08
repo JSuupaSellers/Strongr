@@ -40,7 +40,7 @@ class UnitManager: ObservableObject {
     
     // MARK: - Published Properties
     
-    @Published var unitSystem: UnitSystem {
+    @Published var unitSystem: UnitSystem = .imperial {
         didSet {
             saveUnitPreference()
         }
@@ -49,6 +49,10 @@ class UnitManager: ObservableObject {
     // MARK: - UserDefaults Keys
     
     private let unitSystemKey = "unitSystem"
+    
+    // MARK: - Singleton Instance
+    
+    static let shared = UnitManager()
     
     // MARK: - Initialization
     
