@@ -9,78 +9,161 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var unitManager: UnitManager
+    @State private var activeSchedule: WorkoutSchedule?
+    @State private var showingOnboarding: Bool = false
+    
     var body: some View {
-        NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+        ZStack {
+            TabView {
+                NavigationView {
+                    HomeView()
+                        .environmentObject(unitManager)
+                }
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+                
+                NavigationView {
+                    WorkoutsListView()
+                        .environmentObject(unitManager)
+                }
+                .tabItem {
+                    Label("Workouts", systemImage: "figure.strengthtraining.traditional")
+                }
+                
+                NavigationView {
+                    Group {
+                        if let schedule = activeSchedule {
+                            ScheduleView(schedule: schedule)
+                        } else {
+                            VStack(spacing: 20) {
+                                Image(systemName: "calendar.badge.plus")
+                                    .font(.system(size: 60))
+                                    .foregroundColor(.secondary)
+                                    .padding()
+                                
+                                Text("No Active Schedule")
+                                    .font(.headline)
+                                
+                                Text("Create a schedule to plan your workouts")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                
+                                Button(action: {
+                                    showScheduleManager()
+                                }) {
+                                    Text("Create Schedule")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 24)
+                                        .padding(.vertical, 12)
+                                        .background(Color.blue)
+                                        .cornerRadius(10)
+                                }
+                                .padding(.top, 12)
+                            }
+                            .navigationTitle("Schedule")
+                            .toolbar {
+                                ToolbarItem(placement: .navigationBarTrailing) {
+                                    Button(action: {
+                                        showScheduleManager()
+                                    }) {
+                                        Image(systemName: "gear")
+                                    }
+                                }
+                            }
+                        }
                     }
+                    .environmentObject(unitManager)
                 }
-                .onDelete(perform: deleteItems)
+                .tabItem {
+                    Label("Schedule", systemImage: "calendar")
+                }
+                
+                NavigationView {
+                    ExercisesView()
+                        .environmentObject(unitManager)
+                }
+                .tabItem {
+                    Label("Exercises", systemImage: "dumbbell")
+                }
+                
+                NavigationView {
+                    StatsView()
+                        .environmentObject(unitManager)
+                }
+                .tabItem {
+                    Label("Stats", systemImage: "chart.bar.xaxis")
+                }
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+            .onAppear {
+                loadActiveSchedule()
+                checkForFirstLaunch()
             }
-            Text("Select an item")
+            
+            // Show onboarding view as overlay when needed
+            if showingOnboarding {
+                OnboardingView()
+                    .environmentObject(dataManager)
+                    .environmentObject(unitManager)
+                    .transition(.opacity)
+                    .zIndex(1) // Ensure it's on top
+            }
+        }
+        .animation(.easeInOut, value: showingOnboarding)
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("OnboardingCompleted"))) { _ in
+            showingOnboarding = false
         }
     }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+    
+    private func loadActiveSchedule() {
+        let request = NSFetchRequest<WorkoutSchedule>(entityName: "WorkoutSchedule")
+        request.predicate = NSPredicate(format: "isActive == %@", NSNumber(value: true))
+        request.fetchLimit = 1
+        
+        do {
+            let results = try dataManager.context.fetch(request)
+            activeSchedule = results.first
+        } catch {
+            print("Error fetching active schedule: \(error)")
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
+    
+    private func checkForFirstLaunch() {
+        // Check if this is the first launch
+        if dataManager.isFirstLaunch() {
+            showingOnboarding = true
         }
+    }
+    
+    private func showScheduleManager() {
+        // Present the schedule manager as a sheet
+        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+        let rootViewController = windowScene?.windows.first?.rootViewController
+        
+        let hostingController = UIHostingController(
+            rootView: ScheduleManagerView()
+                .environmentObject(dataManager)
+                .environmentObject(unitManager)
+                .onDisappear {
+                    // Reload active schedule when the manager is dismissed
+                    loadActiveSchedule()
+                }
+        )
+        
+        let navigationController = UINavigationController(rootViewController: hostingController)
+        navigationController.modalPresentationStyle = .fullScreen
+        
+        rootViewController?.present(navigationController, animated: true)
     }
 }
 
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
-#Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environmentObject(DataManager.preview)
+            .environmentObject(UnitManager())
+    }
 }
