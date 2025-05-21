@@ -19,6 +19,7 @@ extension ExerciseHistory {
     @NSManaged public var duration: Double
     @NSManaged public var notes: String?
     @NSManaged public var csvSetData: String?
+    @NSManaged public var user: User?
 
 }
 

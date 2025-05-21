@@ -153,6 +153,7 @@ class CoreDataWorkoutRepository: WorkoutRepository {
         historyEntry.date = workout.date
         historyEntry.duration = workout.duration
         historyEntry.notes = workout.notes
+        historyEntry.user = workout.user // Assign the user
 
         if let sets = workout.sets as? Set<WorkoutSet>, !sets.isEmpty {
             let setStrings = sets.sorted(by: { $0.setNumber < $1.setNumber }).compactMap { workoutSet -> String? in

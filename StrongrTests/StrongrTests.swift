@@ -299,6 +299,8 @@ struct StrongrTests {
         // Comparing dates directly can be tricky due to precision. Compare timeIntervalSince1970.
         #expect(historyEntry.date?.timeIntervalSince1970 == originalWorkoutDate?.timeIntervalSince1970, "History date mismatch")
         #expect(historyEntry.duration == originalWorkoutDuration, "History duration mismatch")
+        #expect(historyEntry.user != nil, "History entry user should not be nil")
+        #expect(historyEntry.user == user, "History entry user mismatch")
 
         let historySetData = historyEntry.csvSetData?.split(separator: "\n").map(String.init).sorted().joined(separator: "\n") ?? ""
         #expect(historySetData == originalSetData, "History CSV set data mismatch. \nExpected:\n\(originalSetData)\nGot:\n\(historySetData)")

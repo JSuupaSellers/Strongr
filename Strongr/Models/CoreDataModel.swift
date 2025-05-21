@@ -96,5 +96,5 @@ import CoreData
  - csvSetData: String? (Stores set data as a CSV-like string. Each line represents a set and contains comma-separated values for "exerciseName,reps,weight,timeSeconds".)
  
  Relationships:
- - None explicitly defined in this version. Could be related back to User if needed in future enhancements.
+ - user: User? (To-one optional relationship to the User who performed the workout)
  */
