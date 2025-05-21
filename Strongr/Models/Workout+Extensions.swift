@@ -9,11 +9,7 @@ import Foundation
 import CoreData
 
 /*
- Note: The startTime and endTime properties are implemented as runtime properties
- using Objective-C associated objects (see CoreDataExtensions.swift).
- 
- This allows us to maintain dynamic workout timing without adding these fields to the 
- Core Data model - just as the user requested.
+ Note: The startTime and endTime properties are now persisted properties in the Core Data model.
  
  When a workout session starts, startTime is set.
  When the workout completes, endTime is set and duration is calculated.
@@ -27,21 +23,21 @@ extension Workout {
     
     // End a workout session and calculate duration
     func endWorkout() {
-        let endTime = Date()
-        self.endTime = endTime
+        let newEndTime = Date() // Use a different name to avoid conflict if self.endTime is already set
+        self.endTime = newEndTime
         
         // Calculate duration based on start and end times
         if let startTime = self.startTime {
-            let calculatedDuration = endTime.timeIntervalSince(startTime)
+            let calculatedDuration = newEndTime.timeIntervalSince(startTime)
             self.duration = calculatedDuration
         }
     }
     
     // Computed property for workout status
     var status: WorkoutStatus {
-        if let startTime = self.startTime, self.endTime == nil {
+        if self.startTime != nil && self.endTime == nil { // Check persisted properties directly
             return .inProgress
-        } else if let _ = self.startTime, let _ = self.endTime {
+        } else if self.startTime != nil && self.endTime != nil { // Check persisted properties directly
             return .completed
         } else {
             return .planned

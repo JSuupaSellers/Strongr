@@ -146,9 +146,26 @@ class CoreDataWorkoutRepository: WorkoutRepository {
     // MARK: - Private helper methods
     
     private func preserveWorkoutHistory(_ workout: Workout) {
-        // This method would create a WorkoutHistory entry to keep records
-        // even after deleting the workout
-        // Implementation depends on your data model
-        print("Preserving workout history before deletion")
+        let historyEntry = ExerciseHistory(context: context)
+        historyEntry.id = UUID()
+        historyEntry.originalWorkoutID = workout.id
+        historyEntry.name = workout.name
+        historyEntry.date = workout.date
+        historyEntry.duration = workout.duration
+        historyEntry.notes = workout.notes
+
+        if let sets = workout.sets as? Set<WorkoutSet>, !sets.isEmpty {
+            let setStrings = sets.sorted(by: { $0.setNumber < $1.setNumber }).compactMap { workoutSet -> String? in
+                let exerciseName = workoutSet.exercise?.name ?? "Unknown Exercise"
+                let reps = workoutSet.reps
+                let weight = workoutSet.weight
+                let timeSeconds = workoutSet.timeSeconds
+                return "\(exerciseName),\(reps),\(weight),\(timeSeconds)"
+            }
+            historyEntry.csvSetData = setStrings.joined(separator: "\n")
+        } else {
+            historyEntry.csvSetData = nil
+        }
+        // The context will be saved by the calling delete() method.
     }
-} 
+}

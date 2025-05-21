@@ -9,17 +9,15 @@ import Foundation
 import CoreData
 
 /*
- Note: The 'completed' property is implemented as a runtime property
- using Objective-C associated objects (see CoreDataExtensions.swift).
+ Note: The 'completed' property is now a persisted property in the Core Data model.
  
- This allows us to track set completion during workouts without adding 
- this field to the Core Data model.
+ This allows us to track set completion during workouts.
 */
 
 extension WorkoutSet {
     // Mark a set as completed during a workout session
     func markCompleted() {
-        self.completed = true
+        self.completed = true // This will now use the persisted 'completed' property
     }
     
     // Format weight with unit

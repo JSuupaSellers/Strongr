@@ -42,8 +42,8 @@ import CoreData
  - date: Date
  - duration: Double (in seconds)
  - notes: String (optional)
- - startTime: Date (optional, used when tracking a workout in progress)
- - endTime: Date (optional, used when a workout is completed)
+ - startTime: Date? (Persisted: Stores the start time of the workout)
+ - endTime: Date? (Persisted: Stores the end time of the workout)
  
  Relationships:
  - user: User (to-one relationship)
@@ -75,9 +75,26 @@ import CoreData
  - weight: Double (in kg)
  - reps: Int16
  - timeSeconds: Double (for timed exercises)
- - completed: Boolean (to track if a set was completed during a workout)
+ - completed: Boolean (Persisted: Tracks if a set was completed during a workout, defaults to false)
  
  Relationships:
  - workout: Workout (to-one relationship)
  - exercise: Exercise (to-one relationship)
- */ 
+ */
+
+/*
+ Entity: ExerciseHistory
+ Description: Stores details of deleted workouts to preserve workout history.
+ 
+ Attributes:
+ - id: UUID (Identifier for the history entry)
+ - originalWorkoutID: UUID? (ID of the Workout it came from)
+ - name: String? (Name of the workout)
+ - date: Date? (When the workout occurred)
+ - duration: Double (Duration of the workout in seconds)
+ - notes: String? (Any notes for the workout)
+ - csvSetData: String? (Stores set data as a CSV-like string. Each line represents a set and contains comma-separated values for "exerciseName,reps,weight,timeSeconds".)
+ 
+ Relationships:
+ - None explicitly defined in this version. Could be related back to User if needed in future enhancements.
+ */
